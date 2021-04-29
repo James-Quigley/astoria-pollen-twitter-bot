@@ -46,3 +46,13 @@ data "aws_iam_policy_document" "lambda_update_policy" {
     resources = ["*"]
   }
 }
+
+resource "aws_iam_policy" "astoria_pollen_twitter_lambda" {
+  name   = "astoria_pollen_twitter_lambda"
+  policy = data.aws_iam_policy_document.lambda_update_policy.json
+}
+
+resource "aws_iam_user_policy_attachment" "astoria_pollen_twitter_lambda" {
+  policy_arn = aws_iam_policy.astoria_pollen_twitter_lambda.arn
+  user       = aws_iam_user.astoria_pollen_twitter.name
+}
