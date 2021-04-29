@@ -1,0 +1,34 @@
+name: Go Build
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.15
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.15
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: go build -o astoria-pollen-twitter -v .
+      - name: Zip
+        run: |
+          mkdir -p builds
+          zip -o astoria-pollen-twitter.zip astoria-pollen-twitter
+      - name: AWS Lambda Deploy
+        uses: appleboy/lambda-action@v0.0.2
+        with:
+          aws_region: "us-east-1"
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          function_name: "astoria-pollen-twitter"
+          zip_file: astoria-pollen-twitter.zip
