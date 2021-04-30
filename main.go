@@ -90,11 +90,6 @@ func LoadPollenData() (PollenAPIResponse, error) {
 }
 
 func InitTwitterAPI() (*anaconda.TwitterApi, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
-	}
-
 	twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
 	twitterAccessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
 	twitterConsumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
@@ -124,6 +119,8 @@ func FormatTweet(result PollenAPIResponse) string {
 }
 
 func HandleRequest() error {
+	godotenv.Load()
+
 	api, err := InitTwitterAPI()
 	if err != nil {
 		return err
