@@ -37,9 +37,9 @@ resource "aws_cloudwatch_event_rule" "astoria_pollen_twitter" {
 }
 
 resource "aws_cloudwatch_event_target" "astoria_pollen_twitter" {
-  rule      = aws_cloudwatch_event_rule.astoria_pollen_twitter.name
-  target_id = "astoria_pollen_twitter"
-  arn       = aws_lambda_function.astoria_pollen_twitter.arn
+ rule      = aws_cloudwatch_event_rule.astoria_pollen_twitter.name
+ target_id = "astoria_pollen_twitter"
+ arn       = aws_lambda_function.astoria_pollen_twitter.arn
 }
 
 resource "aws_lambda_permission" "astoria_pollen_twitter" {
