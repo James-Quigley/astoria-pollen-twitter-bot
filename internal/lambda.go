@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -130,8 +131,39 @@ func FormatTweet(result PollenAPIResponse) string {
 	default:
 		scale = "High"
 	}
-	var str string = "Astoria pollen level for " + month.String() + " " + strconv.Itoa(day) + ": " + idx + "/12 (" + scale + ") - " + strings.Join(triggers, ", ")
+	var str string = "Astoria pollen level for " + month.String() + " " + strconv.Itoa(day) + ": " + idx + "/12 (" + scale + ") - " + strings.Join(triggers, ", ") + "\n" + getEmojiScale(math.Ceil(num))
 	return str
+}
+
+func getEmojiScale(n float64) string {
+	scale := ""
+	switch n {
+	case 1:
+		scale = "🟩⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️"
+	case 2:
+		scale = "🟩🟩⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️"
+	case 3:
+		scale = "🟩🟩🟩⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️"
+	case 4:
+		scale = "🟩🟩🟩🟨⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️"
+	case 5:
+		scale = "🟩🟩🟩🟨🟨⬜️⬜️⬜️⬜️⬜️⬜️⬜️"
+	case 6:
+		scale = "🟩🟩🟩🟨🟨🟨⬜️⬜️⬜️⬜️⬜️⬜️"
+	case 7:
+		scale = "🟩🟩🟩🟨🟨🟨🟧⬜️⬜️⬜️⬜️⬜️"
+	case 8:
+		scale = "🟩🟩🟩🟨🟨🟨🟧🟧⬜️⬜️⬜️⬜️"
+	case 9:
+		scale = "🟩🟩🟩🟨🟨🟨🟧🟧🟧⬜️⬜️⬜️"
+	case 10:
+		scale = "🟩🟩🟩🟨🟨🟨🟧🟧🟧🟥⬜️⬜️"
+	case 11:
+		scale = "🟩🟩🟩🟨🟨🟨🟧🟧🟧🟥🟥⬜️"
+	case 12:
+		scale = "🟩🟩🟩🟨🟨🟨🟧🟧🟧🟥🟥🟥"
+	}
+	return scale
 }
 
 func Handle() error {
