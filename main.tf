@@ -37,9 +37,9 @@ resource "aws_cloudwatch_event_rule" "astoria_pollen_twitter" {
 }
 
 resource "aws_cloudwatch_event_target" "astoria_pollen_twitter" {
- rule      = aws_cloudwatch_event_rule.astoria_pollen_twitter.name
- target_id = "astoria_pollen_twitter"
- arn       = aws_lambda_function.astoria_pollen_twitter.arn
+  rule      = aws_cloudwatch_event_rule.astoria_pollen_twitter.name
+  target_id = "astoria_pollen_twitter"
+  arn       = aws_lambda_function.astoria_pollen_twitter.arn
 }
 
 resource "aws_lambda_permission" "astoria_pollen_twitter" {
@@ -62,9 +62,30 @@ data "aws_iam_policy_document" "astoria_pollen_twitter_assume_role" {
 
 }
 
+data "aws_iam_policy_document" "astoria_pollen_twitter_permissions" {
+  statement {
+    actions = [
+      "ssm:GetParameter*"
+    ]
+    resources = [
+      "arn:aws:ssm:*:579709515411:parameter/astoria-pollen/*"
+    ]
+  }
+}
+
 resource "aws_iam_role" "astoria_pollen_twitter" {
   name               = "astoria-pollen-twitter"
   assume_role_policy = data.aws_iam_policy_document.astoria_pollen_twitter_assume_role.json
+}
+
+resource "aws_iam_policy" "astoria_pollen_twitter_policy" {
+  policy = data.aws_iam_policy_document.astoria_pollen_twitter_permissions.json
+}
+
+
+resource "aws_iam_role_policy_attachment" "astoria_pollen_twitter_policy" {
+  role       = aws_iam_role.astoria_pollen_twitter.name
+  policy_arn = aws_iam_policy.astoria_pollen_twitter_policy.arn
 }
 
 resource "aws_iam_policy" "astoria_pollen_twitter_lambda_logging" {
