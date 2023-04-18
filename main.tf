@@ -65,10 +65,13 @@ data "aws_iam_policy_document" "astoria_pollen_twitter_assume_role" {
 data "aws_iam_policy_document" "astoria_pollen_twitter_permissions" {
   statement {
     actions = [
-      "ssm:GetParameter*"
+      "ssm:GetParametersByPath",
+      "ssm:GetParameters",
+      "ssm:GetParameter"
     ]
     resources = [
-      "arn:aws:ssm:*:579709515411:parameter/astoria-pollen/*"
+      "arn:aws:ssm:*:579709515411:parameter/astoria-pollen/*",
+      "arn:aws:ssm:*:579709515411:parameter/astoria-pollen"
     ]
   }
 }

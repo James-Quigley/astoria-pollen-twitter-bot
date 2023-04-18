@@ -211,7 +211,8 @@ func Handle() error {
 		ssmSvc := ssm.New(sess)
 		paramPath := "/astoria-pollen"
 		output, err := ssmSvc.GetParametersByPathWithContext(context.TODO(), &ssm.GetParametersByPathInput{
-			Path: &paramPath,
+			Path:           &paramPath,
+			WithDecryption: aws.Bool(true),
 		})
 		if err != nil {
 			log.Fatal(err)
