@@ -13,6 +13,10 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/joho/godotenv"
 	mastodon "github.com/mattn/go-mastodon"
 )
@@ -197,6 +201,32 @@ func ValidateEnvVars() error {
 
 func Handle() error {
 	godotenv.Load()
+
+	sess := session.Must(session.NewSession(&aws.Config{
+		Region: aws.String(endpoints.UsEast1RegionID),
+	}))
+	skipSsm := os.Getenv("SKIP_SSM_PARAMETERS")
+
+	if skipSsm != "true" {
+		ssmSvc := ssm.New(sess)
+		paramPath := "/astoria-pollen"
+		output, err := ssmSvc.GetParametersByPathWithContext(context.TODO(), &ssm.GetParametersByPathInput{
+			Path: &paramPath,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, param := range output.Parameters {
+			paramPathParts := strings.Split(*param.Name, "/")
+			paramName := paramPathParts[len(paramPathParts)-1]
+			err = os.Setenv(paramName, *param.Value)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+	}
 
 	err := ValidateEnvVars()
 	if err != nil {

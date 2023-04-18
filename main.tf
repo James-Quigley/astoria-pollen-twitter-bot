@@ -82,7 +82,6 @@ resource "aws_iam_policy" "astoria_pollen_twitter_policy" {
   policy = data.aws_iam_policy_document.astoria_pollen_twitter_permissions.json
 }
 
-
 resource "aws_iam_role_policy_attachment" "astoria_pollen_twitter_policy" {
   role       = aws_iam_role.astoria_pollen_twitter.name
   policy_arn = aws_iam_policy.astoria_pollen_twitter_policy.arn
