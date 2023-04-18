@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/joho/godotenv"
+	mastodon "github.com/mattn/go-mastodon"
 )
 
 type PollenApiResponsePeriodTrigger struct {
@@ -89,22 +91,30 @@ func LoadPollenData() (PollenAPIResponse, error) {
 	return result, nil
 }
 
-func InitTwitterAPI() (*anaconda.TwitterApi, error) {
+func InitTwitterAPI() *anaconda.TwitterApi {
 	twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
 	twitterAccessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
 	twitterConsumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
 	twitterConsumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
-
-	if twitterAccessToken == "" || twitterAccessTokenSecret == "" || twitterConsumerKey == "" || twitterConsumerSecret == "" {
-		return nil, errors.New("Missing required Twitter environment variables")
-	}
 
 	api := anaconda.NewTwitterApiWithCredentials(
 		twitterAccessToken,
 		twitterAccessTokenSecret,
 		twitterConsumerKey,
 		twitterConsumerSecret)
-	return api, nil
+	return api
+}
+
+func InitMastodonAPI() *mastodon.Client {
+	mastodonServerUrl := os.Getenv("MASTODON_SERVER_URL")
+	mastodonAccessToken := os.Getenv("MASTODON_ACCESS_TOKEN")
+
+	c := mastodon.NewClient(&mastodon.Config{
+		Server:      mastodonServerUrl,
+		AccessToken: mastodonAccessToken,
+	})
+
+	return c
 }
 
 /*
@@ -166,10 +176,29 @@ func getEmojiScale(n float64) string {
 	return scale
 }
 
+func ValidateEnvVars() error {
+	mastodonServerUrl := os.Getenv("MASTODON_SERVER_URL")
+	mastodonAccessToken := os.Getenv("MASTODON_ACCESS_TOKEN")
+
+	if mastodonServerUrl == "" || mastodonAccessToken == "" {
+		return errors.New("Missing required Mastodon environment variables")
+	}
+
+	twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
+	twitterAccessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	twitterConsumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
+	twitterConsumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
+
+	if twitterAccessToken == "" || twitterAccessTokenSecret == "" || twitterConsumerKey == "" || twitterConsumerSecret == "" {
+		return errors.New("Missing required Twitter environment variables")
+	}
+	return nil
+}
+
 func Handle() error {
 	godotenv.Load()
 
-	api, err := InitTwitterAPI()
+	err := ValidateEnvVars()
 	if err != nil {
 		return err
 	}
@@ -178,12 +207,23 @@ func Handle() error {
 	if err != nil {
 		return err
 	}
+
 	if result.Location.Periods[1].Index > 1 {
 		str := FormatTweet(result)
 		log.Println(str)
-		_, err = api.PostTweet(str, nil)
-		if err != nil {
-			return err
+		if os.Getenv("DRY_RUN") != "true" {
+			twitterApi := InitTwitterAPI()
+			mastodonClient := InitMastodonAPI()
+			_, twitterErr := twitterApi.PostTweet(str, nil)
+			_, mastodonErr := mastodonClient.PostStatus(context.TODO(), &mastodon.Toot{
+				Status: str,
+			})
+			if twitterErr != nil {
+				return twitterErr
+			}
+			if mastodonErr != nil {
+				return mastodonErr
+			}
 		}
 	}
 	return nil
