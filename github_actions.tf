@@ -41,8 +41,16 @@ resource "aws_iam_user_policy_attachment" "astoria_pollen_twitter" {
 
 data "aws_iam_policy_document" "lambda_update_policy" {
   statement {
-    effect    = "Allow"
-    actions   = ["s3:PutObject", "iam:ListRoles", "lambda:UpdateFunctionCode", "lamvda:CreateFunction"]
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "iam:ListRoles",
+      "lambda:UpdateFunctionCode",
+      "lambda:CreateFunction",
+      "lambda:GetFunction",
+      "lambda:UpdateFunctionConfiguration",
+      "lambda:GetFunctionConfiguration"
+    ]
     resources = ["*"]
   }
 }
