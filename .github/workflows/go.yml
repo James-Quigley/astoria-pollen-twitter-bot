@@ -9,14 +9,14 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.15
-        uses: actions/setup-go@v1
+      - name: Set up Go 1.20
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.15
+          go-version: "^1.20.0"
         id: go
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Build
         run: go build -o astoria-pollen-twitter -v .
@@ -25,7 +25,7 @@ jobs:
           mkdir -p builds
           zip -o astoria-pollen-twitter.zip astoria-pollen-twitter
       - name: AWS Lambda Deploy
-        uses: appleboy/lambda-action@v0.0.2
+        uses: appleboy/lambda-action@v0.1.9
         with:
           aws_region: "us-east-1"
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
