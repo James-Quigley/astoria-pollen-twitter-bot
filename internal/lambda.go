@@ -188,14 +188,14 @@ func ValidateEnvVars() error {
 		return errors.New("Missing required Mastodon environment variables")
 	}
 
-	twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
-	twitterAccessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
-	twitterConsumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
-	twitterConsumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
+	// twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
+	// twitterAccessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	// twitterConsumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
+	// twitterConsumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
 
-	if twitterAccessToken == "" || twitterAccessTokenSecret == "" || twitterConsumerKey == "" || twitterConsumerSecret == "" {
-		return errors.New("Missing required Twitter environment variables")
-	}
+	// if twitterAccessToken == "" || twitterAccessTokenSecret == "" || twitterConsumerKey == "" || twitterConsumerSecret == "" {
+	// 	return errors.New("Missing required Twitter environment variables")
+	// }
 	return nil
 }
 
@@ -243,15 +243,15 @@ func Handle() error {
 		str := FormatTweet(result)
 		log.Println(str)
 		if os.Getenv("DRY_RUN") != "true" {
-			twitterApi := InitTwitterAPI()
+			// twitterApi := InitTwitterAPI()
 			mastodonClient := InitMastodonAPI()
-			_, twitterErr := twitterApi.PostTweet(str, nil)
+			// _, twitterErr := twitterApi.PostTweet(str, nil)
 			_, mastodonErr := mastodonClient.PostStatus(context.TODO(), &mastodon.Toot{
 				Status: str,
 			})
-			if twitterErr != nil {
-				return twitterErr
-			}
+			// if twitterErr != nil {
+			// 	return twitterErr
+			// }
 			if mastodonErr != nil {
 				return mastodonErr
 			}
