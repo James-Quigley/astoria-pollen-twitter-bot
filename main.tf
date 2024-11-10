@@ -30,24 +30,24 @@ resource "aws_lambda_function" "astoria_pollen_twitter" {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "astoria_pollen_twitter" {
-  name                = "astoria-pollen-twitter-invocation"
-  description         = "Runs the astoria-pollen-twitter bot daily"
-  schedule_expression = "cron(0 11 * * ? *)"
-}
+# resource "aws_cloudwatch_event_rule" "astoria_pollen_twitter" {
+#   name                = "astoria-pollen-twitter-invocation"
+#   description         = "Runs the astoria-pollen-twitter bot daily"
+#   schedule_expression = "cron(0 11 * * ? *)"
+# }
 
-resource "aws_cloudwatch_event_target" "astoria_pollen_twitter" {
-  rule      = aws_cloudwatch_event_rule.astoria_pollen_twitter.name
-  target_id = "astoria_pollen_twitter"
-  arn       = aws_lambda_function.astoria_pollen_twitter.arn
-}
+# resource "aws_cloudwatch_event_target" "astoria_pollen_twitter" {
+#   rule      = aws_cloudwatch_event_rule.astoria_pollen_twitter.name
+#   target_id = "astoria_pollen_twitter"
+#   arn       = aws_lambda_function.astoria_pollen_twitter.arn
+# }
 
-resource "aws_lambda_permission" "astoria_pollen_twitter" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.astoria_pollen_twitter.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.astoria_pollen_twitter.arn
-}
+# resource "aws_lambda_permission" "astoria_pollen_twitter" {
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.astoria_pollen_twitter.function_name
+#   principal     = "events.amazonaws.com"
+#   source_arn    = aws_cloudwatch_event_rule.astoria_pollen_twitter.arn
+# }
 
 data "aws_iam_policy_document" "astoria_pollen_twitter_assume_role" {
   statement {
